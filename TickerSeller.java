@@ -1,3 +1,9 @@
+//Carlos Angel 23310
+//Diego Monroy 23318
+//Programación Oriendata a Objetos, Franco Augusto
+//Ejercicio 1. Overloading y relaciones entre clases
+//Own knowledge
+
 import java.util.Scanner;
 import java.util.Random;
 
@@ -10,10 +16,12 @@ public class TicketSeller {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Locality[] localities = initializeLocalities();
-        TicketRequest request = null;
+        Locality[] localities = initializeLocalities(); // Initialize localities and their ticket information
+        TicketRequest request = null; // Initialize ticket request object for buyer
 
         while (verify) {
+            // Display menu options
+            System.out.println("");
             System.out.println("1. Enter as a new buyer");
             System.out.println("2. Enter as the same buyer");
             System.out.println("3. Check the number of tickets available");
@@ -25,6 +33,7 @@ public class TicketSeller {
             int menu = Integer.parseInt(scanner.nextLine());
 
             if (menu == 1) {
+                // Collect buyer information to create a new ticket request
                 System.out.println("Enter name: ");
                 String name = scanner.nextLine();
                 System.out.println("Enter DPI: ");
@@ -39,47 +48,88 @@ public class TicketSeller {
 
             if (request != null && (menu == 1 || menu == 2)) {
                 int ticket = generateRandomNumber(33000);
-                int z = generateRandomNumber(3); // Generates 1, 2, or 3
+                int z = generateRandomNumber(3); // Generate a random locality index
                 
                 if (isTicketAffordable(ticket)) {
+                    // Attempt to sell tickets based on a random locality
                     if (z == 1) {
+                        // If ticket is affordable and there are available tickets, sell the tickets
                         if (localities[0].validateAndSell(request)) {
                             System.out.println("Tickets sold successfully! You are in Locality #1");
                             int maxBudget1 = request.maxBudget;
                             request.maxBudget -= localities[0].price * request.countsOfTicket;
-                            int price = maxBudget1-request.maxBudget;
-                            System.out.println(price);
+                            int price = maxBudget1 - request.maxBudget;
+                            System.out.println("The total of your tickets is: $" + price);
                         } else {
                             System.out.println("Tickets could not be sold");
                         }
                     } else if (z == 2) {
+                        // Similar process for another locality
                         if (localities[1].validateAndSell(request)) {
                             System.out.println("Tickets sold successfully! You are in Locality #5");
                             int maxBudget1 = request.maxBudget;
                             request.maxBudget -= localities[1].price * request.countsOfTicket;
-                            int price = maxBudget1-request.maxBudget;
-                            System.out.println(price);
+                            int price = maxBudget1 - request.maxBudget;
+                            System.out.println("The total of your tickets is: $" + price);
                         } else {
                             System.out.println("Tickets could not be sold");
                         }
                     } else if (z == 3) {
+                        // And yet another locality
                         if (localities[2].validateAndSell(request)) {
                             System.out.println("Tickets sold successfully! You are in Locality #10");
                             int maxBudget1 = request.maxBudget;
                             request.maxBudget -= localities[2].price * request.countsOfTicket;
-                            int price = maxBudget1-request.maxBudget;
-                            System.out.println(price);
+                            int price = maxBudget1 - request.maxBudget;
+                            System.out.println("The total of your tickets is: $" + price);
                         } else {
                             System.out.println("Tickets could not be sold");
                         }
                     }
                 } else {
+                    // If ticket is not affordable, cannot sell tickets
                     System.out.println("Tickets could not be sold");
                 }
             }
 
-            // Add other menu options and exit condition
+            if (menu == 3) {
+                // Display the number of tickets sold and available for each locality
+                System.out.println("Total tickets sold and available for each locality:");
+                for (int i = 0; i < LOCALITIES_COUNT; i++) {
+                    System.out.println("Locality #" + (i + 1) + ": Sold " + (TICKETS_PER_LOCALITY - localities[i].availableTickets) +" tickets, Available " + localities[i].availableTickets + " tickets");
+                }
+            }
+
+            if (menu == 4) {
+                // Check availability for a specific locality
+                System.out.println("Enter the locality number (1=Locality1, 2=Locality5, 3=Locality10) to check availability:");
+                int selectedLocality = Integer.parseInt(scanner.nextLine());
+                if (selectedLocality > 0 && selectedLocality < LOCALITIES_COUNT + 1) {
+                    if(selectedLocality == 1){
+                        System.out.println("Available tickets for Locality #1: " + localities[selectedLocality-1].availableTickets);
+                    }
+                    if(selectedLocality == 2){
+                        System.out.println("Available tickets for Locality #5: " + localities[selectedLocality-1].availableTickets);
+                    }
+                    if(selectedLocality == 3){
+                        System.out.println("Available tickets for Locality #10: " + localities[selectedLocality-1].availableTickets);
+                    }
+                } else {
+                    System.out.println("Invalid locality number.");
+                }
+            }
+
+            if (menu == 5) {
+                // Calculate and display total revenue from ticket sales
+                int totalRevenue = 0;
+                for (int i = 0; i < LOCALITIES_COUNT; i++) {
+                    int soldTickets = TICKETS_PER_LOCALITY - localities[i].availableTickets;
+                    totalRevenue += soldTickets * localities[i].price;
+                }
+                System.out.println("Total revenue generated: $" + totalRevenue);
+            }
             if (menu == 6) {
+                // Exit the loop, ending the ticket selling process
                 verify = false;
             }
         }
@@ -99,11 +149,8 @@ public class TicketSeller {
     }
 
     private static boolean isTicketAffordable(int ticket) {
-        System.out.println(ticket);
         int a = generateRandomNumber(15000);
-        System.out.println(a);
         int b = generateRandomNumber(15000);
-        System.out.println(b);
         return (ticket + a + b) % 2 == 0;
     }
 }
