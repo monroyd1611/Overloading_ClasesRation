@@ -6,28 +6,81 @@ public class TicketSeller {
     private static final int LOCALITIES_COUNT = 3;
     private static final int TICKETS_PER_LOCALITY = TOTAL_TICKETS / LOCALITIES_COUNT;
     private static final int[] TICKET_PRICES = {400, 695, 2350};
+    private static boolean verify = true;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Locality[] localities = initializeLocalities();
+        TicketRequest request = null;
 
-        System.out.println("Enter name: ");
-        String name = scanner.nextLine();
-        System.out.println("Enter DPI: ");
-        String dpi = scanner.nextLine();
-        System.out.println("Enter how many tickets you want: ");
-        int CountsOfTicket = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter your max Budget: ");
-        int maximBudget = Integer.parseInt(scanner.nextLine());
+        while (verify) {
+            System.out.println("1. Enter as a new buyer");
+            System.out.println("2. Enter as the same buyer");
+            System.out.println("3. Check the number of tickets available");
+            System.out.println("4. Check the number of tickets available for a location");
+            System.out.println("5. Check accounting cash");
+            System.out.println("6. Exit");
+            System.out.println("Select a number from the menu");
+            
+            int menu = Integer.parseInt(scanner.nextLine());
 
-        TicketRequest request = new TicketRequest(name, dpi, CountsOfTicket, maximBudget);
-        int ticket = generateRandomNumber(33000);
-        if (isTicketaffordable(ticket)) {
-            Locality locality = assignRandomLocality(localities);
-            if (locality.validateAndSell(request)) {
-                System.out.println("Tickets sold successfully!");
-            } else {
-                System.out.println("Tickets could not be sold");
+            if (menu == 1) {
+                System.out.println("Enter name: ");
+                String name = scanner.nextLine();
+                System.out.println("Enter DPI: ");
+                String dpi = scanner.nextLine();
+                System.out.println("Enter how many tickets you want: ");
+                int countsOfTicket = Integer.parseInt(scanner.nextLine());
+                System.out.println("Enter your max Budget: ");
+                int maxBudget = Integer.parseInt(scanner.nextLine());
+
+                request = new TicketRequest(name, dpi, countsOfTicket, maxBudget);
+            }
+
+            if (request != null && (menu == 1 || menu == 2)) {
+                int ticket = generateRandomNumber(33000);
+                int z = generateRandomNumber(3); // Generates 1, 2, or 3
+                
+                if (isTicketAffordable(ticket)) {
+                    if (z == 1) {
+                        if (localities[0].validateAndSell(request)) {
+                            System.out.println("Tickets sold successfully! You are in Locality #1");
+                            int maxBudget1 = request.maxBudget;
+                            request.maxBudget -= localities[0].price * request.countsOfTicket;
+                            int price = maxBudget1-request.maxBudget;
+                            System.out.println(price);
+                        } else {
+                            System.out.println("Tickets could not be sold");
+                        }
+                    } else if (z == 2) {
+                        if (localities[1].validateAndSell(request)) {
+                            System.out.println("Tickets sold successfully! You are in Locality #5");
+                            int maxBudget1 = request.maxBudget;
+                            request.maxBudget -= localities[1].price * request.countsOfTicket;
+                            int price = maxBudget1-request.maxBudget;
+                            System.out.println(price);
+                        } else {
+                            System.out.println("Tickets could not be sold");
+                        }
+                    } else if (z == 3) {
+                        if (localities[2].validateAndSell(request)) {
+                            System.out.println("Tickets sold successfully! You are in Locality #10");
+                            int maxBudget1 = request.maxBudget;
+                            request.maxBudget -= localities[2].price * request.countsOfTicket;
+                            int price = maxBudget1-request.maxBudget;
+                            System.out.println(price);
+                        } else {
+                            System.out.println("Tickets could not be sold");
+                        }
+                    }
+                } else {
+                    System.out.println("Tickets could not be sold");
+                }
+            }
+
+            // Add other menu options and exit condition
+            if (menu == 6) {
+                verify = false;
             }
         }
     }
@@ -45,7 +98,7 @@ public class TicketSeller {
         return rand.nextInt(range) + 1;
     }
 
-    private static boolean isTicketaffordable(int ticket) {
+    private static boolean isTicketAffordable(int ticket) {
         System.out.println(ticket);
         int a = generateRandomNumber(15000);
         System.out.println(a);
@@ -53,24 +106,19 @@ public class TicketSeller {
         System.out.println(b);
         return (ticket + a + b) % 2 == 0;
     }
-
-    private static Locality assignRandomLocality(Locality[] localities) {
-        return localities[generateRandomNumber(LOCALITIES_COUNT) - 1];
-    }
-
 }
 
 class TicketRequest {
     String name;
     String dpi;
-    int CountsOfTicket;
-    int maximBudget;
+    int countsOfTicket;
+    int maxBudget;
 
-    public TicketRequest(String name, String dpi, int CountsOfTicket, int maximBudget) {
+    public TicketRequest(String name, String dpi, int countsOfTicket, int maxBudget) {
         this.name = name;
         this.dpi = dpi;
-        this.CountsOfTicket = CountsOfTicket;
-        this.maximBudget = maximBudget;
+        this.countsOfTicket = countsOfTicket;
+        this.maxBudget = maxBudget;
     }
 }
 
@@ -89,11 +137,11 @@ class Locality {
         if (availableTickets == 0) {
             return false;
         }
-        if (request.maximBudget < price) {
+        if (request.maxBudget < price) {
             return false;
         }
 
-        int ticketsToSell = Math.min(request.CountsOfTicket, availableTickets);
+        int ticketsToSell = Math.min(request.countsOfTicket, availableTickets);
         availableTickets -= ticketsToSell;
         return true;
     }
